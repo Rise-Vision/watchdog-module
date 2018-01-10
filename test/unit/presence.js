@@ -44,7 +44,46 @@ describe("Presence - Unit", ()=>
             assert.fail(`invalid log module argument ${call.args[0]}`);
         }
       });
+
+      return presence.updateStatus({
+        "display-control": false, "logging": false, "local-storage": true
+      })
     })
+    .then(() => {
+      // watching always logs
+      assert.equal(logger.all.callCount, 2);
+      assert.equal(logger.all.lastCall.args[0], "watching");
+
+      // just one change ( display-control )
+      assert.equal(logger.logModuleAvailability.callCount, 4);
+      assert.equal(logger.logModuleAvailability.lastCall.args[0], "display-control");
+      assert.equal(logger.logModuleAvailability.lastCall.args[1], false);
+
+      return presence.updateStatus({
+        "display-control": false, "logging": true, "local-storage": false
+      })
+    })
+    .then(() => {
+      // watching always logs
+      assert.equal(logger.all.callCount, 3);
+      assert.equal(logger.all.lastCall.args[0], "watching");
+
+      // two changes ( logging and local-storage )
+      assert.equal(logger.logModuleAvailability.callCount, 6);
+      logger.logModuleAvailability.calls.slice(4).forEach(call => {
+        switch (call.args[0])
+        {
+          case "local-storage":
+            assert(!call.args[1]);
+            break;
+          case "logging":
+            assert(call.args[1]);
+            break;
+          default:
+            assert.fail(`invalid log module argument ${call.args[0]}`);
+        }
+      });
+    });
   });
 
 });
