@@ -17,11 +17,11 @@ describe("Presence - Unit", ()=>
 
   afterEach(() => {
     simple.restore();
-    presence.resetStatusTable();
+    presence.resetPreviousStatusTable();
   });
 
   it("should update presence and log changes", () => {
-    return presence.updateStatus({
+    return presence.updateStatusTable({
       "display-control": true, "logging": false, "local-storage": true
     })
     .then(() => {
@@ -45,7 +45,7 @@ describe("Presence - Unit", ()=>
         }
       });
 
-      return presence.updateStatus({
+      return presence.updateStatusTable({
         "display-control": false, "logging": false, "local-storage": true
       })
     })
@@ -59,7 +59,7 @@ describe("Presence - Unit", ()=>
       assert.equal(logger.logModuleAvailability.lastCall.args[0], "display-control");
       assert.equal(logger.logModuleAvailability.lastCall.args[1], false);
 
-      return presence.updateStatus({
+      return presence.updateStatusTable({
         "display-control": false, "logging": true, "local-storage": false
       })
     })

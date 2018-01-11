@@ -1,35 +1,37 @@
 /* eslint-disable function-paren-newline, id-length */
 const logger = require("./logger");
 
+// Holds the last status that have been sent to logging.
 // Each key is a module name, and the value is a boolean up/down status value.
-const statusTable = {};
+const previousStatusTable = {};
 
-function updateStatus(updatedStatusTable) {
+/**
+ * Updates the last status with a whole set of updated status for each module.
+ * @param {Object} updatedStatusTable MUST contain a property key for every watched module.
+ * @return {Promise} to allow chaining.
+ */
+function updateStatusTable(updatedStatusTable) {
   const changed = Object.keys(updatedStatusTable).filter(key =>
-    statusTable[key] !== updatedStatusTable[key]
+    previousStatusTable[key] !== updatedStatusTable[key]
   );
 
-  Object.assign(statusTable, updatedStatusTable);
+  Object.assign(previousStatusTable, updatedStatusTable);
 
   return logger.all("watching").then(() =>
     changed.reduce((promise, moduleName) =>
       promise.then(() =>
-        logger.logModuleAvailability(moduleName, statusTable[moduleName])
+        logger.logModuleAvailability(moduleName, updatedStatusTable[moduleName])
       ), Promise.resolve()
     )
   );
 }
 
-// exposed for test purposes only.
-function getStatusTable() {
-  return statusTable;
-}
-function resetStatusTable() {
-  Object.keys(statusTable).forEach(key => statusTable[key] = null);
+// Exposed for test purposes only.
+function resetPreviousStatusTable() {
+  Object.keys(previousStatusTable).forEach(key => previousStatusTable[key] = null);
 }
 
 module.exports = {
-  getStatusTable,
-  resetStatusTable,
-  updateStatus
+  resetPreviousStatusTable,
+  updateStatusTable
 }
