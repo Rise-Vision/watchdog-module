@@ -5,11 +5,7 @@ const logger = require("./logger");
 // Each key is a module name, and the value is a boolean up/down status value.
 const previousStatusTable = {};
 
-/**
- * Updates the last status with a whole set of updated status for each module.
- * @param {Object} updatedStatusTable MUST contain a property key for every watched module.
- * @return {Promise} to allow chaining.
- */
+// Updates the last status with a whole set of updated status for each module.
 function updateStatusTable(updatedStatusTable) {
   const changed = Object.keys(updatedStatusTable).filter(key =>
     previousStatusTable[key] !== updatedStatusTable[key]
