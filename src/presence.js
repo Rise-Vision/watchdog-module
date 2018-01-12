@@ -26,6 +26,13 @@ function init() {
   currentStatusTable.viewer = false;
 }
 
+function setModuleStatusAsUp(moduleName) {
+  // only update modules being watched.
+  if (moduleName in currentStatusTable) {
+    currentStatusTable[moduleName] = true;
+  }
+}
+
 function logUpdatedAndReset() {
   const updated = Object.assign({}, currentStatusTable);
 
@@ -70,5 +77,6 @@ module.exports = {
   init,
   logUpdated,
   logUpdatedAndReset,
+  setModuleStatusAsUp,
   reset
 }

@@ -82,8 +82,7 @@ describe("Presence - Unit", ()=>
       // two changes ( logging and local-storage )
       assert.equal(logger.logModuleAvailability.callCount, 6);
       logger.logModuleAvailability.calls.slice(4).forEach(call => {
-        switch (call.args[0])
-        {
+        switch (call.args[0]) {
           case "local-storage":
             assert(!call.args[1]);
             break;
@@ -115,6 +114,65 @@ describe("Presence - Unit", ()=>
 
         // as no heatbeat, all modules down
         assert.equal(call.args[1], false);
+      });
+    });
+  });
+
+  it("should report modules as up if a HEARBEAT arrives", () => {
+    presence.init();
+
+    presence.setModuleStatusAsUp("player-electron");
+    presence.setModuleStatusAsUp("local-messaging");
+    presence.setModuleStatusAsUp("local-storage");
+    presence.setModuleStatusAsUp("logging");
+
+    return presence.logUpdatedAndReset().then(() => {
+      // watching always logs
+      assert.equal(logger.all.callCount, 1);
+      assert.equal(logger.all.lastCall.args[0], "watching");
+
+      // 7 modules
+      assert.equal(logger.logModuleAvailability.callCount, 7);
+
+      logger.logModuleAvailability.calls.forEach(call => {
+        switch (call.args[0]) {
+          case "player-electron": case "local-messaging": case "local-storage":
+          case "logging":
+            assert(call.args[1]);
+            break;
+          case "display-control": case "system-metrics": case "viewer":
+            assert(!call.args[1]);
+            break;
+          default:
+            assert.fail(`invalid log module argument ${call.args[0]}`);
+        }
+      });
+
+      presence.setModuleStatusAsUp("player-electron");
+      presence.setModuleStatusAsUp("local-messaging");
+      presence.setModuleStatusAsUp("local-storage");
+      presence.setModuleStatusAsUp("viewer");
+
+      return presence.logUpdatedAndReset().then(() => {
+        // watching always logs
+        assert.equal(logger.all.callCount, 2);
+        assert.equal(logger.all.lastCall.args[0], "watching");
+
+        // 2 modules changed status, logging went to off, viewer went to on
+        assert.equal(logger.logModuleAvailability.callCount, 9);
+
+        logger.logModuleAvailability.calls.slice(7).forEach(call => {
+          switch (call.args[0]) {
+            case "logging":
+              assert(!call.args[1]);
+              break;
+            case "viewer":
+              assert(call.args[1]);
+              break;
+            default:
+              assert.fail(`invalid log module argument ${call.args[0]}`);
+          }
+        });
       });
     });
   });
