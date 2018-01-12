@@ -15,14 +15,14 @@ describe("Presence - Unit", ()=>
     simple.mock(logger, "all").resolveWith(true);
     simple.mock(logger, "logModuleAvailability").resolveWith(true);
     simple.mock(common, "getManifest").returnWith({
-      "launcher": { version: "" },
-      "player-electron": { version: "" },
-      "local-messaging": { version: "" },
-      "local-storage": { version: "" },
-      "logging": { version: "" },
-      "display-control": { version: "" },
-      "system-metrics": { version: "" },
-      "watchdog": { version: "" }
+      "launcher": {version: ""},
+      "player-electron": {version: ""},
+      "local-messaging": {version: ""},
+      "local-storage": {version: ""},
+      "logging": {version: ""},
+      "display-control": {version: ""},
+      "system-metrics": {version: ""},
+      "watchdog": {version: ""}
     });
   });
 
@@ -98,9 +98,9 @@ describe("Presence - Unit", ()=>
   });
 
   it("should report all modules as down if no HEARBEAT arrives", () => {
-    persence.init();
+    presence.init();
 
-    return persence.logUpdatedAndReset().then(() => {
+    return presence.logUpdatedAndReset().then(() => {
       // watching always logs
       assert.equal(logger.all.callCount, 1);
       assert.equal(logger.all.lastCall.args[0], "watching");
@@ -110,7 +110,7 @@ describe("Presence - Unit", ()=>
       logger.logModuleAvailability.calls.forEach(call => {
         assert([
           "player-electron", "local-messaging", "local-storage", "logging",
-          "display-control", "system-metrics"
+          "display-control", "system-metrics", "viewer"
         ].includes(call.args[0]));
 
         // as no heatbeat, all modules down
