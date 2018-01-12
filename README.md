@@ -17,7 +17,7 @@ npm run test
 
 ### Manual testing
 
-An rvplayer install with valid RiseDisplayNetworkII.ini and
+A rvplayer install with valid RiseDisplayNetworkII.ini and
 module-manifest.json files is needed. Rise Vision Player must not be
 running.
 
@@ -37,7 +37,7 @@ npm install
 node src/index.js
 ```
 
-Clone, install and add additional modules if desired.
+Clone, install and run additional modules if desired.
 
 Then, supposing watchdog-module is already installed, open another
 terminal window and run it:
