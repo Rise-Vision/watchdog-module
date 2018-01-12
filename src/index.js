@@ -1,12 +1,30 @@
+/* eslint-disable default-case */
+
 const common = require("common-display-module");
 const config = require("./config");
+const iterations = require("./iterations");
 const logger = require("./logger");
 const presence = require("./presence");
 
-presence.init();
+function run(schedule = setTimeout) {
+  presence.init();
 
-common.receiveMessages(config.moduleName).then(() => {
-  // message handling will go here ( check presence data from local messaging in a following card )
+  common.receiveMessages(config.moduleName).then(receiver => {
+    receiver.on("message", message => {
+      switch (message.topic.toUpperCase()) {
+        case "HEARTBEAT":
+          return presence.setModuleStatusAsUp(message.from);
+      }
+    });
 
-  return logger.all("started");
-});
+    iterations.execute(schedule);
+
+    return logger.all("started");
+  });
+}
+
+if (process.env.NODE_ENV !== "test") {
+  run();
+}
+
+module.exports = {run};
