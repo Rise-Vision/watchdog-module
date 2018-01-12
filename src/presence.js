@@ -6,7 +6,7 @@ const logger = require("./logger");
 // Watchdog won't add these modules to its status table.
 const EXCLUDED_WATCHED_MODULES = [config.moduleName, "launcher"];
 
-// Holds the current status.
+// Maps module name to boolean up/down status value.
 // Must be initialized with the module names before it starts receiving HEARTBEAT updates.
 const currentStatusTable = {};
 
