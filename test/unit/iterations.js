@@ -14,7 +14,7 @@ describe("Iterations - Unit", ()=>
 
   beforeEach(() =>
   {
-    simple.mock(config, "delayBeforeFirstIteration").returnWith(0);
+    simple.mock(config, "getDelayBeforeFirstIteration").returnWith(0);
     simple.mock(presence, "logUpdatedAndReset").resolveWith(true);
   });
 

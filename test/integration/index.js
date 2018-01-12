@@ -21,7 +21,7 @@ describe("Watchdog - Integration", ()=>
     simple.mock(common, "getClientList").returnWith();
     simple.mock(common, "getDisplaySettings").resolveWith(settings);
     simple.mock(common, "getModuleVersion").returnWith("1.1");
-    simple.mock(config, "delayBeforeFirstIteration").returnWith(0);
+    simple.mock(config, "getDelayBeforeFirstIteration").returnWith(0);
     simple.mock(common, "getManifest").returnWith({
       "launcher": {version: ""},
       "player-electron": {version: ""},

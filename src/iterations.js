@@ -19,10 +19,10 @@ function execute(schedule = setInterval) {
   // safety catch, stop any previous execution.
   stop()
 
-  const offset = config.delayBeforeFirstIteration();
+  const offset = config.getDelayBeforeFirstIteration();
 
   setTimeout(() => {
-    const interval = config.watchIntervalDuration();
+    const interval = config.getWatchInterval();
 
     timerId = schedule(logPresenceAndReset, interval);
   }, offset);

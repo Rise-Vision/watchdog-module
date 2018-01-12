@@ -7,7 +7,7 @@ const DEFAULT_WATCH_INTERVAL = 5;
 const moduleName = "watchdog";
 
 // Can be set via environment variable OFFSET. 0 means no delay.
-function delayBeforeFirstIteration() {
+function getDelayBeforeFirstIteration() {
   const value = Number(process.env.OFFSET || DEFAULT_OFFSET);
 
   return value * MINUTES;
@@ -15,7 +15,7 @@ function delayBeforeFirstIteration() {
 
 // Can be set via environment variable WATCH_INTERVAL, which is useful for testing purposes.
 // Should not be set to less than the HEARBEAT interval in common-display-module.
-function watchIntervalDuration() {
+function getWatchInterval() {
   const value = Number(process.env.WATCH_INTERVAL || DEFAULT_WATCH_INTERVAL);
 
   return value * MINUTES;
@@ -31,6 +31,6 @@ module.exports = {
   getModuleVersion() {
     return common.getModuleVersion(moduleName)
   },
-  delayBeforeFirstIteration,
-  watchIntervalDuration
+  getDelayBeforeFirstIteration,
+  getWatchInterval
 };
