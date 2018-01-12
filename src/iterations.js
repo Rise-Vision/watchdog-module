@@ -15,7 +15,7 @@ function logPresenceAndReset() {
   })
 }
 
-function execute(schedule = setTimeout) {
+function execute(schedule = setInterval) {
   // safety catch, stop any previous execution.
   stop()
 

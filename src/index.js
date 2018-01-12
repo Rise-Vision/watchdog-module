@@ -6,7 +6,7 @@ const iterations = require("./iterations");
 const logger = require("./logger");
 const presence = require("./presence");
 
-function run(schedule = setTimeout) {
+function run(schedule = setInterval) {
   presence.init();
 
   common.receiveMessages(config.moduleName).then(receiver => {
