@@ -177,4 +177,29 @@ describe("Presence - Unit", ()=>
     });
   });
 
+  it("should not log presence for modules not being watched", () => {
+    presence.init();
+
+    // launcher is not currently being watched
+    presence.setModuleStatusAsUp("launcher");
+
+    return presence.logUpdatedAndReset().then(() => {
+      // watching always logs
+      assert.equal(logger.all.callCount, 1);
+      assert.equal(logger.all.lastCall.args[0], "watching");
+
+      // 7 modules
+      assert.equal(logger.logModuleAvailability.callCount, 7);
+      logger.logModuleAvailability.calls.forEach(call => {
+        assert([
+          "player-electron", "local-messaging", "local-storage", "logging",
+          "display-control", "system-metrics", "viewer"
+        ].includes(call.args[0]));
+
+        // as no heatbeat, all modules down
+        assert.equal(call.args[1], false);
+      });
+    });
+  });
+
 });
