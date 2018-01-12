@@ -4,10 +4,8 @@ const config = require("./config");
 const logger = require("./logger");
 const presence = require("./presence");
 
-let timerId = null;
-
 function logPresenceAndReset() {
-  presence.logUpdatedAndReset()
+  return presence.logUpdatedAndReset()
   .catch(error => {
     const detail = error.stack || JSON.stringify(error)
 
@@ -15,27 +13,14 @@ function logPresenceAndReset() {
   })
 }
 
-function startLoggingPresence() {
-  const interval = config.watchIntervalDuration();
-
-  timerId = setInterval(logPresenceAndReset, interval);
-}
-
-function execute() {
-  // safety catch, stop any previous execution.
-  stop();
-
+function execute(schedule = setTimeout) {
   const offset = config.delayBeforeFirstIteration();
 
-  setTimeout(startLoggingPresence, offset);
+  setTimeout(() => {
+    const interval = config.watchIntervalDuration();
+
+    schedule(logPresenceAndReset, interval);
+  }, offset);
 }
 
-function stop() {
-  if (timerId) {
-    clearInterval(timerId);
-
-    timerId = null;
-  }
-}
-
-module.exports = {execute, stop};
+module.exports = {execute};
