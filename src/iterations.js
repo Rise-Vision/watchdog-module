@@ -4,7 +4,7 @@ const config = require("./config");
 const logger = require("./logger");
 const presence = require("./presence");
 
-let timerId = null
+let timerId = null;
 
 function logPresenceAndReset() {
   return presence.logUpdatedAndReset()
@@ -17,7 +17,7 @@ function logPresenceAndReset() {
 
 function execute(schedule = setInterval) {
   // safety catch, stop any previous execution.
-  stop()
+  stop();
 
   const offset = config.getDelayBeforeFirstIteration();
 
@@ -30,9 +30,9 @@ function execute(schedule = setInterval) {
 
 function stop() {
   if (timerId) {
-    clearInterval(timerId)
+    clearInterval(timerId);
 
-    timerId = null
+    timerId = null;
   }
 }
 
