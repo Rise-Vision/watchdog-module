@@ -1,6 +1,7 @@
 /* eslint-env mocha */
 /* eslint-disable max-statements, no-magic-numbers */
 const assert = require("assert");
+const common = require("common-display-module");
 const simple = require("simple-mock");
 
 const logger = require("../../src/logger");
@@ -13,15 +14,25 @@ describe("Presence - Unit", ()=>
   {
     simple.mock(logger, "all").resolveWith(true);
     simple.mock(logger, "logModuleAvailability").resolveWith(true);
+    simple.mock(common, "getManifest").returnWith({
+      "launcher": {version: ""},
+      "player-electron": {version: ""},
+      "local-messaging": {version: ""},
+      "local-storage": {version: ""},
+      "logging": {version: ""},
+      "display-control": {version: ""},
+      "system-metrics": {version: ""},
+      "watchdog": {version: ""}
+    });
   });
 
   afterEach(() => {
     simple.restore();
-    presence.resetPreviousStatusTable();
+    presence.reset();
   });
 
   it("should update presence and log changes", () => {
-    return presence.updateStatusTable({
+    return presence.logUpdated({
       "display-control": true, "logging": false, "local-storage": true
     })
     .then(() => {
@@ -45,7 +56,7 @@ describe("Presence - Unit", ()=>
         }
       });
 
-      return presence.updateStatusTable({
+      return presence.logUpdated({
         "display-control": false, "logging": false, "local-storage": true
       })
     })
@@ -59,7 +70,7 @@ describe("Presence - Unit", ()=>
       assert.equal(logger.logModuleAvailability.lastCall.args[0], "display-control");
       assert.equal(logger.logModuleAvailability.lastCall.args[1], false);
 
-      return presence.updateStatusTable({
+      return presence.logUpdated({
         "display-control": false, "logging": true, "local-storage": false
       })
     })
@@ -71,8 +82,7 @@ describe("Presence - Unit", ()=>
       // two changes ( logging and local-storage )
       assert.equal(logger.logModuleAvailability.callCount, 6);
       logger.logModuleAvailability.calls.slice(4).forEach(call => {
-        switch (call.args[0])
-        {
+        switch (call.args[0]) {
           case "local-storage":
             assert(!call.args[1]);
             break;
@@ -82,6 +92,112 @@ describe("Presence - Unit", ()=>
           default:
             assert.fail(`invalid log module argument ${call.args[0]}`);
         }
+      });
+    });
+  });
+
+  it("should report all modules as down if no HEARBEAT arrives", () => {
+    presence.init();
+
+    return presence.logUpdatedAndReset().then(() => {
+      // watching always logs
+      assert.equal(logger.all.callCount, 1);
+      assert.equal(logger.all.lastCall.args[0], "watching");
+
+      // 7 modules
+      assert.equal(logger.logModuleAvailability.callCount, 7);
+      logger.logModuleAvailability.calls.forEach(call => {
+        assert([
+          "player-electron", "local-messaging", "local-storage", "logging",
+          "display-control", "system-metrics", "viewer"
+        ].includes(call.args[0]));
+
+        // as no heatbeat, all modules down
+        assert.equal(call.args[1], false);
+      });
+    });
+  });
+
+  it("should report modules as up if a HEARBEAT arrives", () => {
+    presence.init();
+
+    presence.setModuleStatusAsUp("player-electron");
+    presence.setModuleStatusAsUp("local-messaging");
+    presence.setModuleStatusAsUp("local-storage");
+    presence.setModuleStatusAsUp("logging");
+
+    return presence.logUpdatedAndReset().then(() => {
+      // watching always logs
+      assert.equal(logger.all.callCount, 1);
+      assert.equal(logger.all.lastCall.args[0], "watching");
+
+      // 7 modules
+      assert.equal(logger.logModuleAvailability.callCount, 7);
+
+      logger.logModuleAvailability.calls.forEach(call => {
+        switch (call.args[0]) {
+          case "player-electron": case "local-messaging": case "local-storage":
+          case "logging":
+            assert(call.args[1]);
+            break;
+          case "display-control": case "system-metrics": case "viewer":
+            assert(!call.args[1]);
+            break;
+          default:
+            assert.fail(`invalid log module argument ${call.args[0]}`);
+        }
+      });
+
+      presence.setModuleStatusAsUp("player-electron");
+      presence.setModuleStatusAsUp("local-messaging");
+      presence.setModuleStatusAsUp("local-storage");
+      presence.setModuleStatusAsUp("viewer");
+
+      return presence.logUpdatedAndReset().then(() => {
+        // watching always logs
+        assert.equal(logger.all.callCount, 2);
+        assert.equal(logger.all.lastCall.args[0], "watching");
+
+        // 2 modules changed status, logging went to off, viewer went to on
+        assert.equal(logger.logModuleAvailability.callCount, 9);
+
+        logger.logModuleAvailability.calls.slice(7).forEach(call => {
+          switch (call.args[0]) {
+            case "logging":
+              assert(!call.args[1]);
+              break;
+            case "viewer":
+              assert(call.args[1]);
+              break;
+            default:
+              assert.fail(`invalid log module argument ${call.args[0]}`);
+          }
+        });
+      });
+    });
+  });
+
+  it("should not log presence for modules not being watched", () => {
+    presence.init();
+
+    // launcher is not currently being watched
+    presence.setModuleStatusAsUp("launcher");
+
+    return presence.logUpdatedAndReset().then(() => {
+      // watching always logs
+      assert.equal(logger.all.callCount, 1);
+      assert.equal(logger.all.lastCall.args[0], "watching");
+
+      // 7 modules
+      assert.equal(logger.logModuleAvailability.callCount, 7);
+      logger.logModuleAvailability.calls.forEach(call => {
+        assert([
+          "player-electron", "local-messaging", "local-storage", "logging",
+          "display-control", "system-metrics", "viewer"
+        ].includes(call.args[0]));
+
+        // as no heatbeat, all modules down
+        assert.equal(call.args[1], false);
       });
     });
   });
