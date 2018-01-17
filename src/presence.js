@@ -23,7 +23,8 @@ function init() {
   .forEach(moduleName => currentStatusTable[moduleName] = false);
 
   // add viewer manually, it's not in module-manifest.json
-  currentStatusTable.viewer = false;
+  // disable until a later card
+  // currentStatusTable.viewer = false;
 }
 
 function setModuleStatusAsUp(moduleName) {
