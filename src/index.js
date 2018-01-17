@@ -6,14 +6,21 @@ const iterations = require("./iterations");
 const logger = require("./logger");
 const presence = require("./presence");
 
+function receiveHeartbeat(message) {
+  // viewer reports through websocket channel in local messaging.
+  const moduleName =
+    message.from === 'ws-client' ? 'viewer' : message.from;
+
+  return presence.setModuleStatusAsUp(moduleName);
+}
+
 function run(schedule = setInterval) {
   presence.init();
 
   common.receiveMessages(config.moduleName).then(receiver => {
     receiver.on("message", message => {
       switch (message.topic.toUpperCase()) {
-        case "HEARTBEAT":
-          return presence.setModuleStatusAsUp(message.from);
+        case "HEARTBEAT": return receiveHeartbeat(message);
       }
     });
 
@@ -27,4 +34,4 @@ if (process.env.NODE_ENV !== "test") {
   run();
 }
 
-module.exports = {run};
+module.exports = {receiveHeartbeat, run};

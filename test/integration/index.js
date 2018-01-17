@@ -109,7 +109,7 @@ describe("Watchdog - Integration", ()=>
         eventHandler({topic: "heartbeat", from: "player-electron"});
         eventHandler({topic: "heartbeat", from: "local-messaging"});
         eventHandler({topic: "heartbeat", from: "local-storage"});
-        eventHandler({topic: "heartbeat", from: "viewer"});
+        eventHandler({topic: "heartbeat", from: "ws-client"});
 
         return action();
       })
@@ -159,7 +159,7 @@ describe("Watchdog - Integration", ()=>
         eventHandler({topic: "heartbeat", from: "player-electron"});
         eventHandler({topic: "heartbeat", from: "local-messaging"});
         eventHandler({topic: "heartbeat", from: "local-storage"});
-        eventHandler({topic: "heartbeat", from: "viewer"});
+        eventHandler({topic: "heartbeat", from: "ws-client"});
 
         done();
       })
