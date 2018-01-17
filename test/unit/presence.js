@@ -104,8 +104,8 @@ describe("Presence - Unit", ()=>
       assert.equal(logger.all.callCount, 1);
       assert.equal(logger.all.lastCall.args[0], "watching");
 
-      // 7 modules
-      assert.equal(logger.logModuleAvailability.callCount, 7);
+      // 6 modules
+      assert.equal(logger.logModuleAvailability.callCount, 6);
       logger.logModuleAvailability.calls.forEach(call => {
         assert([
           "player-electron", "local-messaging", "local-storage", "logging",
@@ -131,8 +131,8 @@ describe("Presence - Unit", ()=>
       assert.equal(logger.all.callCount, 1);
       assert.equal(logger.all.lastCall.args[0], "watching");
 
-      // 7 modules
-      assert.equal(logger.logModuleAvailability.callCount, 7);
+      // 6 modules
+      assert.equal(logger.logModuleAvailability.callCount, 6);
 
       logger.logModuleAvailability.calls.forEach(call => {
         switch (call.args[0]) {
@@ -151,22 +151,24 @@ describe("Presence - Unit", ()=>
       presence.setModuleStatusAsUp("player-electron");
       presence.setModuleStatusAsUp("local-messaging");
       presence.setModuleStatusAsUp("local-storage");
-      presence.setModuleStatusAsUp("viewer");
+      // presence.setModuleStatusAsUp("viewer");
+      presence.setModuleStatusAsUp("display-control");
 
       return presence.logUpdatedAndReset().then(() => {
         // watching always logs
         assert.equal(logger.all.callCount, 2);
         assert.equal(logger.all.lastCall.args[0], "watching");
 
-        // 2 modules changed status, logging went to off, viewer went to on
-        assert.equal(logger.logModuleAvailability.callCount, 9);
+        // 6 previous calls + 2 modules changed status, logging went to off, display-control went to on
+        assert.equal(logger.logModuleAvailability.callCount, 8);
 
-        logger.logModuleAvailability.calls.slice(7).forEach(call => {
+        logger.logModuleAvailability.calls.slice(6).forEach(call => {
           switch (call.args[0]) {
             case "logging":
               assert(!call.args[1]);
               break;
             case "viewer":
+            case "display-control":
               assert(call.args[1]);
               break;
             default:
@@ -188,8 +190,8 @@ describe("Presence - Unit", ()=>
       assert.equal(logger.all.callCount, 1);
       assert.equal(logger.all.lastCall.args[0], "watching");
 
-      // 7 modules
-      assert.equal(logger.logModuleAvailability.callCount, 7);
+      // 6 modules
+      assert.equal(logger.logModuleAvailability.callCount, 6);
       logger.logModuleAvailability.calls.forEach(call => {
         assert([
           "player-electron", "local-messaging", "local-storage", "logging",

@@ -62,8 +62,8 @@ describe("Watchdog - Integration", ()=>
       action().then(() => {
         assert(common.broadcastMessage.called);
 
-        // started event + watching event + 7 status events
-        assert.equal(common.broadcastMessage.callCount, 9);
+        // started event + watching event + 6 status events
+        assert.equal(common.broadcastMessage.callCount, 8);
 
         common.broadcastMessage.calls.slice(1).forEach(call => {
 
@@ -109,15 +109,16 @@ describe("Watchdog - Integration", ()=>
         eventHandler({topic: "heartbeat", from: "player-electron"});
         eventHandler({topic: "heartbeat", from: "local-messaging"});
         eventHandler({topic: "heartbeat", from: "local-storage"});
-        eventHandler({topic: "heartbeat", from: "viewer"});
+        eventHandler({topic: "heartbeat", from: "display-control"});
+        // eventHandler({topic: "heartbeat", from: "viewer"});
 
         return action();
       })
       .then(() => {
-        // 9 previous events + watching + 2 change events
-        assert.equal(common.broadcastMessage.callCount, 12);
+        // 8 previous events + watching + 2 change events
+        assert.equal(common.broadcastMessage.callCount, 11);
 
-        common.broadcastMessage.calls.slice(9).forEach(call => {
+        common.broadcastMessage.calls.slice(8).forEach(call => {
 
           // this is the actual event object sent to the logging module
           const event = call.args[0]
@@ -148,6 +149,7 @@ describe("Watchdog - Integration", ()=>
                 assert(row.event, "module-down");
                 break;
               case "viewer":
+              case "display-control":
                 assert(row.event, "module-up");
                 break;
               default:
