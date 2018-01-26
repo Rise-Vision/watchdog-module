@@ -2,6 +2,7 @@
 /* eslint-disable max-statements, no-magic-numbers */
 const assert = require("assert");
 const common = require("common-display-module");
+const messaging = require("common-display-module/messaging");
 const simple = require("simple-mock");
 
 const config = require("../../src/config");
@@ -17,8 +18,8 @@ describe("Watchdog - Integration", ()=>
   {
     const settings = {displayid: "DIS123"};
 
-    simple.mock(common, "broadcastMessage").returnWith();
-    simple.mock(common, "getClientList").returnWith();
+    simple.mock(messaging, "broadcastMessage").returnWith();
+    simple.mock(messaging, "getClientList").returnWith();
     simple.mock(common, "getDisplaySettings").resolveWith(settings);
     simple.mock(common, "getModuleVersion").returnWith("1.1");
     simple.mock(config, "getDelayBeforeFirstIteration").returnWith(0);
@@ -54,18 +55,18 @@ describe("Watchdog - Integration", ()=>
       }
     }
 
-    simple.mock(common, "receiveMessages").resolveWith(new Receiver());
+    simple.mock(messaging, "receiveMessages").resolveWith(new Receiver());
 
     watchdog.run((action, interval) => {
       assert.equal(interval, FIVE_MINUTES);
 
       action().then(() => {
-        assert(common.broadcastMessage.called);
+        assert(messaging.broadcastMessage.called);
 
         // started event + watching event + 6 status events
-        assert.equal(common.broadcastMessage.callCount, 8);
+        assert.equal(messaging.broadcastMessage.callCount, 8);
 
-        common.broadcastMessage.calls.slice(1).forEach(call => {
+        messaging.broadcastMessage.calls.slice(1).forEach(call => {
 
           // this is the actual event object sent to the logging module
           const event = call.args[0]
@@ -116,9 +117,9 @@ describe("Watchdog - Integration", ()=>
       })
       .then(() => {
         // 8 previous events + watching + 2 change events
-        assert.equal(common.broadcastMessage.callCount, 11);
+        assert.equal(messaging.broadcastMessage.callCount, 11);
 
-        common.broadcastMessage.calls.slice(8).forEach(call => {
+        messaging.broadcastMessage.calls.slice(8).forEach(call => {
 
           // this is the actual event object sent to the logging module
           const event = call.args[0]
