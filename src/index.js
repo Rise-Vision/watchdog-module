@@ -11,6 +11,7 @@ function run(schedule = setInterval) {
 
   messaging.receiveMessages(config.moduleName).then(receiver => {
     receiver.on("message", message => {
+      if (!message.topic) {return;}
       switch (message.topic.toUpperCase()) {
         case "HEARTBEAT":
           return presence.setModuleStatusAsUp(message.from);
