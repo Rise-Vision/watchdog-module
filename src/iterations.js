@@ -2,13 +2,18 @@
 
 const config = require("./config");
 const presence = require("./presence");
+const content = require("./content");
 
 const presenceScheduler = createScheduler(config.getDelayBeforeFirstIteration(), config.getWatchInterval());
+const contentScheduler = createScheduler(config.getDelayBeforeFirstIteration(), config.getContentWatchInterval());
 
 function execute(schedule = setInterval) {
   // safety catch, stop any previous execution.
   presenceScheduler.stop();
-  presenceScheduler.execute(schedule, () => presence.logUpdatedAndReset());
+  presenceScheduler.execute(schedule, presence.logUpdatedAndReset);
+
+  contentScheduler.stop();
+  contentScheduler.execute(schedule, content.requestScreenshot);
 }
 
 function createScheduler(delayBeforeFirstIteration, interval) {

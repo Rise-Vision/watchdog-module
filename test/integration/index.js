@@ -57,7 +57,7 @@ describe("Watchdog - Integration", ()=>
 
     simple.mock(messaging, "receiveMessages").resolveWith(new Receiver());
 
-    watchdog.run((action, interval) => {
+    const testPresence = (action, interval) => {
       assert.equal(interval, FIVE_MINUTES);
 
       action().then(() => {
@@ -166,7 +166,11 @@ describe("Watchdog - Integration", ()=>
 
         done();
       })
-    });
+    };
+
+    const scheduleFn = simple.stub();
+    scheduleFn.callFn(testPresence).callFn(() => {});
+    watchdog.run(scheduleFn);
   });
 
 });

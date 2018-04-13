@@ -21,6 +21,10 @@ function getWatchInterval() {
   return value * MINUTES;
 }
 
+function getContentWatchInterval() {
+  return getWatchInterval() / 2; // eslint-disable-line
+}
+
 module.exports = {
   bqProjectName: "client-side-events",
   bqDataset: "Module_Events",
@@ -32,5 +36,6 @@ module.exports = {
     return common.getModuleVersion(moduleName)
   },
   getDelayBeforeFirstIteration,
-  getWatchInterval
+  getWatchInterval,
+  getContentWatchInterval
 };
