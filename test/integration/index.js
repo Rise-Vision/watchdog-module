@@ -1,5 +1,3 @@
-/* eslint-env mocha */
-/* eslint-disable max-statements, no-magic-numbers */
 const assert = require("assert");
 const common = require("common-display-module");
 const messaging = require("common-display-module/messaging");
@@ -57,7 +55,7 @@ describe("Watchdog - Integration", ()=>
 
     simple.mock(messaging, "receiveMessages").resolveWith(new Receiver());
 
-    watchdog.run((action, interval) => {
+    const testPresence = (action, interval) => {
       assert.equal(interval, FIVE_MINUTES);
 
       action().then(() => {
@@ -166,7 +164,11 @@ describe("Watchdog - Integration", ()=>
 
         done();
       })
-    });
+    };
+
+    const scheduleFn = simple.stub();
+    scheduleFn.callFn(testPresence).callFn(() => {});
+    watchdog.run(scheduleFn);
   });
 
 });

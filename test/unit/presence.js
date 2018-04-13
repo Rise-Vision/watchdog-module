@@ -1,5 +1,3 @@
-/* eslint-env mocha */
-/* eslint-disable max-statements, no-magic-numbers */
 const assert = require("assert");
 const common = require("common-display-module");
 const simple = require("simple-mock");
