@@ -19,7 +19,8 @@ function execute(schedule = setInterval) {
 function createScheduler(delayBeforeFirstIteration, interval) {
   let timerId = null;
   return {
-    execute(schedule = setInterval, action = () => { }) {
+    execute(schedule = setInterval, action = () => {}) {
+      if (interval < 0) {return;}
       setTimeout(() => {
         timerId = schedule(action, interval);
       }, delayBeforeFirstIteration);

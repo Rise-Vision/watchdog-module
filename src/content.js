@@ -1,5 +1,5 @@
 function requestScreenshot() {
-  console.log('send local-screenshot-request message');
+  console.log(`${new Date()} - send local-screenshot-request message`);
   return Promise.resolve();
 }
 
