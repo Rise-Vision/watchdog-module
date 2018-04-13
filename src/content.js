@@ -1,6 +1,11 @@
+const messaging = require("common-display-module/messaging");
+const config = require("./config");
+
 function requestScreenshot() {
-  console.log(`${new Date()} - send local-screenshot-request message`);
-  return Promise.resolve();
+  return messaging.broadcastMessage({
+    from: config.moduleName,
+    topic: "local-screenshot-request"
+  });
 }
 
 module.exports = {
