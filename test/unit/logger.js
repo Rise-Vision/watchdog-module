@@ -1,5 +1,3 @@
-/* eslint-env mocha */
-/* eslint-disable max-statements */
 const assert = require("assert");
 const common = require("common-display-module");
 const messaging = require("common-display-module/messaging");
