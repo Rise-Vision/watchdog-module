@@ -4,6 +4,8 @@ const assert = require("assert");
 const simple = require("simple-mock");
 
 const config = require("../../src/config");
+simple.mock(config, "getDelayBeforeFirstIteration").returnWith(0);
+
 const iterations = require("../../src/iterations");
 const presence = require("../../src/presence");
 
@@ -14,7 +16,6 @@ describe("Iterations - Unit", ()=>
 
   beforeEach(() =>
   {
-    simple.mock(config, "getDelayBeforeFirstIteration").returnWith(0);
     simple.mock(presence, "logUpdatedAndReset").resolveWith(true);
   });
 

@@ -1,39 +1,32 @@
 // Iteration loop, separated to facilitate integration tests
 
 const config = require("./config");
-const logger = require("./logger");
 const presence = require("./presence");
 
-let timerId = null;
-
-function logPresenceAndReset() {
-  return presence.logUpdatedAndReset()
-  .catch(error => {
-    const detail = error.stack || JSON.stringify(error)
-
-    logger.error(detail, "Error while logging presence.")
-  })
-}
+const presenceScheduler = createScheduler(config.getDelayBeforeFirstIteration(), config.getWatchInterval());
 
 function execute(schedule = setInterval) {
   // safety catch, stop any previous execution.
-  stop();
-
-  const offset = config.getDelayBeforeFirstIteration();
-
-  setTimeout(() => {
-    const interval = config.getWatchInterval();
-
-    timerId = schedule(logPresenceAndReset, interval);
-  }, offset);
+  presenceScheduler.stop();
+  presenceScheduler.execute(schedule, () => presence.logUpdatedAndReset());
 }
 
-function stop() {
-  if (timerId) {
-    clearInterval(timerId);
+function createScheduler(delayBeforeFirstIteration, interval) {
+  let timerId = null;
+  return {
+    execute(schedule = setInterval, action = () => { }) {
+      setTimeout(() => {
+        timerId = schedule(action, interval);
+      }, delayBeforeFirstIteration);
+    },
 
-    timerId = null;
-  }
+    stop() {
+      if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
+      }
+    }
+  };
 }
 
-module.exports = {execute, stop};
+module.exports = {execute};

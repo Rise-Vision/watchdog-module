@@ -40,7 +40,12 @@ function logUpdatedAndReset() {
   // So it can start receiving new updates.
   resetCurrentStatusTable();
 
-  return logUpdated(updated);
+  return logUpdated(updated)
+  .catch(error => {
+    const detail = error.stack || JSON.stringify(error)
+
+    logger.error(detail, "Error while logging presence.")
+  });
 }
 
 // Updates the last status with a whole set of updated status for each module.
