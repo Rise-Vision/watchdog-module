@@ -9,12 +9,15 @@ const isWindows = process.platform === "win32";
 const fiveSeconds = 5000;
 
 module.exports = {
-  init(interval = defaultInterval, scheduler = setInterval) {
-    scheduler(checkProcess.bind(null, scheduler), interval);
+  init(interval = defaultInterval, intervalScheduler = setInterval) {
+    const timeoutScheduler = intervalScheduler === setInterval ?
+      setTimeout : intervalScheduler;
+
+    intervalScheduler(checkProcess.bind(null, timeoutScheduler), interval);
   }
 };
 
-function checkProcess(scheduler) {
+function checkProcess(timeoutScheduler) {
   const command = isWindows ? defaultWindowsCommand : defaultLinuxCommand;
   const options = {
     timeout: fiveSeconds,
@@ -35,7 +38,7 @@ function checkProcess(scheduler) {
 
     if (notFound) {
       logger.external("no player watchdog", "restarting");
-      scheduler(starter.restart, fiveSeconds);
+      timeoutScheduler(starter.restart, fiveSeconds);
       return;
     }
 
