@@ -14,10 +14,8 @@ function requestScreenshot() {
 
 function checkWhiteScreen(filePath) {
   return readImage(filePath)
-    .then((image) => {
-      return [image, createWhiteImage(image)];
-    })
-    .then(([image, white]) => {
+    .then(image => {
+      const white = createWhiteImage(image);
       const diff = pixelmatch(image.data, white, null, image.width, image.height);
       if (diff <= 0) {
         logger.external("white screen detected");
