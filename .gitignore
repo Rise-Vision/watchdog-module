@@ -7,3 +7,4 @@ coverage/
 test/test-results.xml
 *.zip
 npm-debug.log
+.DS_Store
