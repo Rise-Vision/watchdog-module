@@ -19,24 +19,28 @@ process.on("unhandledRejection", (reason)=>{
 });
 
 function run(schedule = setInterval) {
-  presence.init();
-  processMonitor.init();
+  return config.init()
+  .then(() => {
+    presence.init();
+    processMonitor.init();
 
-  messaging.receiveMessages(config.moduleName).then(receiver => {
-    receiver.on("message", message => {
-      if (!message.topic) {return;}
-      switch (message.topic.toUpperCase()) {
-        case "HEARTBEAT":
-          return presence.setModuleStatusAsUp(message.from);
-        case "LOCAL-SCREENSHOT-RESULT":
-          return content.checkWhiteScreen(message.filePath);
-      }
+    return messaging.receiveMessages(config.moduleName).then(receiver => {
+      receiver.on("message", message => {
+        if (!message.topic) {return;}
+        switch (message.topic.toUpperCase()) {
+          case "HEARTBEAT":
+            return presence.setModuleStatusAsUp(message.from);
+          case "LOCAL-SCREENSHOT-RESULT":
+            return content.checkWhiteScreen(message.filePath);
+        }
+      });
+
+      iterations.execute(schedule);
+
+      return logger.all("started");
     });
-
-    iterations.execute(schedule);
-
-    return logger.all("started");
-  });
+  })
+  .catch(error => logger.error(error.stack, 'startup error'));
 }
 
 if (process.env.NODE_ENV !== "test") {

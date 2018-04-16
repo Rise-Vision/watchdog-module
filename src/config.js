@@ -5,6 +5,13 @@ const DEFAULT_OFFSET = 1;
 const DEFAULT_WATCH_INTERVAL = 5;
 
 const moduleName = "watchdog";
+let contentWatchInterval = getWatchInterval() / 2; // eslint-disable-line
+
+function init() {
+  return common.getDisplayProperty('contentwatchinterval')
+  .then(value => typeof value === 'string' &&
+    (contentWatchInterval = Math.max(0, Number(value)) * MINUTES));
+}
 
 // Can be set via environment variable OFFSET. 0 means no delay.
 function getDelayBeforeFirstIteration() {
@@ -22,7 +29,7 @@ function getWatchInterval() {
 }
 
 function getContentWatchInterval() {
-  return getWatchInterval() / 2; // eslint-disable-line
+  return contentWatchInterval;
 }
 
 module.exports = {
@@ -30,6 +37,7 @@ module.exports = {
   bqDataset: "Module_Events",
   bqTable: "watchdog_events",
   failedEntryFile: "watchdog-failed.log",
+  init,
   logFolder: common.getModulePath(moduleName),
   moduleName,
   getModuleVersion() {
