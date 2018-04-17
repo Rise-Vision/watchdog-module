@@ -30,7 +30,7 @@ function all(eventType, eventDetails = "", data = {}) {
     .then(detail => logger.all(eventType, detail, null, bqTable));
 }
 
-function external(eventType, eventDetails, data = {}) {
+function external(eventType, eventDetails = "", data = {}) {
   return detailsFor(eventDetails, data)
   .then(detail => logger.external(eventType, detail, bqTable));
 }

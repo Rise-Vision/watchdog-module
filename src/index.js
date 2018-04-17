@@ -6,6 +6,7 @@ const config = require("./config");
 const iterations = require("./iterations");
 const logger = require("./logger");
 const presence = require("./presence");
+const content = require("./content");
 
 process.on("uncaughtException", (err)=>{
   logger.file(err.stack);
@@ -27,6 +28,8 @@ function run(schedule = setInterval) {
       switch (message.topic.toUpperCase()) {
         case "HEARTBEAT":
           return presence.setModuleStatusAsUp(message.from);
+        case "LOCAL-SCREENSHOT-RESULT":
+          return content.checkWhiteScreen(message.filePath);
       }
     });
 
