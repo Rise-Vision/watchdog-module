@@ -6,7 +6,10 @@ const config = require("../../src/config");
 
 describe("Config - Unit", () => {
 
-  afterEach(() => simple.restore());
+  afterEach(() => {
+    simple.restore();
+    config.reset();
+  });
 
   it("should use default content watch interval if not configured", () => {
     simple.mock(common, "getDisplayProperty").resolveWith(null);
@@ -16,7 +19,7 @@ describe("Config - Unit", () => {
       const interval = config.getContentWatchInterval();
 
       // by default, half the regular watch interval.
-      assert.equal(interval, 150000);
+      assert.equal(interval, 300000);
     });
   });
 

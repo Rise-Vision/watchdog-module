@@ -5,7 +5,9 @@ const DEFAULT_OFFSET = 1;
 const DEFAULT_WATCH_INTERVAL = 5;
 
 const moduleName = "watchdog";
-let contentWatchInterval = getWatchInterval() / 2; // eslint-disable-line
+let contentWatchInterval = null;
+
+reset();
 
 function init() {
   return common.getDisplayProperty('contentwatchinterval')
@@ -14,10 +16,7 @@ function init() {
       return;
     }
 
-    console.log(Math.max(0, Number(value)) * MINUTES);
-
-    contentWatchInterval = 0;
-     // Math.max(0, Number(value)) * MINUTES;
+    contentWatchInterval = Math.max(0, Number(value)) * MINUTES;
   });
 }
 
@@ -40,6 +39,10 @@ function getContentWatchInterval() {
   return contentWatchInterval;
 }
 
+function reset() {
+  contentWatchInterval = getWatchInterval();
+}
+
 module.exports = {
   bqProjectName: "client-side-events",
   bqDataset: "Module_Events",
@@ -53,5 +56,6 @@ module.exports = {
   },
   getDelayBeforeFirstIteration,
   getWatchInterval,
-  getContentWatchInterval
+  getContentWatchInterval,
+  reset
 };
