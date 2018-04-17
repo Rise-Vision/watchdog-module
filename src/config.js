@@ -17,6 +17,11 @@ function init() {
     }
 
     contentWatchInterval = Math.max(0, Number(value)) * MINUTES;
+
+    if (contentWatchInterval > 0) {
+      contentWatchInterval =
+        Math.max(contentWatchInterval, getWatchInterval() / 2); // eslint-disable-line no-magic-numbers
+    }
   });
 }
 

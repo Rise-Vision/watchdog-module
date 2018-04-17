@@ -33,4 +33,27 @@ describe("Config - Unit", () => {
       assert.equal(interval, 600000);
     });
   });
+
+  it("should not configure a contentwatchinterval less than half the regular watch interval", () => {
+    simple.mock(common, "getDisplayProperty").resolveWith("1");
+
+    return config.init()
+    .then(() => {
+      const interval = config.getContentWatchInterval();
+
+      // configure half the regular watch interval instead
+      assert.equal(interval, 150000);
+    });
+  });
+
+  it("should recognize 0 as disabled content watch", () => {
+    simple.mock(common, "getDisplayProperty").resolveWith("0");
+
+    return config.init()
+    .then(() => {
+      const interval = config.getContentWatchInterval();
+
+      assert.equal(interval, 0);
+    });
+  });
 });
