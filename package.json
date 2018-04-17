@@ -40,6 +40,6 @@
   "dependencies": {
     "common-display-module": "git://github.com/Rise-Vision/common-display-module.git#v3.0.5",
     "pixelmatch": "^4.0.2",
-    "rise-common-electron": "git+https://github.com/Rise-Vision/rise-common-electron.git#v2.2.5"
+    "rise-common-electron": "git+https://github.com/Rise-Vision/rise-common-electron.git#v2.2.8"
   }
 }

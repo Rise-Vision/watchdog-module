@@ -1,5 +1,4 @@
 const assert = require("assert");
-const commonConfig = require("common-display-module");
 const simple = require("simple-mock");
 
 const config = require("../../src/config");
@@ -21,29 +20,25 @@ describe("Iterations - Unit", () => {
   });
 
   it("should start iterations and call presence logging", done => {
-    simple.mock(commonConfig, "getDisplaySettings").resolveWith("displayid=ABC");
+    const testPresence = (action, interval) => {
+      assert.equal(interval, config.getWatchInterval());
 
-    config.init().then(() => {
-      const testPresence = (action, interval) => {
-        assert.equal(interval, config.getWatchInterval());
+      action().then(() => {
+        assert(presence.logUpdatedAndReset.called);
+        assert.equal(presence.logUpdatedAndReset.callCount, 1);
 
-        action().then(() => {
-          assert(presence.logUpdatedAndReset.called);
-          assert.equal(presence.logUpdatedAndReset.callCount, 1);
+        return action();
+      })
+      .then(() => {
+        assert.equal(presence.logUpdatedAndReset.callCount, 2);
 
-          return action();
-        })
-        .then(() => {
-          assert.equal(presence.logUpdatedAndReset.callCount, 2);
+        done();
+      });
+    };
 
-          done();
-        });
-      };
-
-      const scheduleFn = simple.stub();
-      scheduleFn.callFn(testPresence).callFn(() => {});
-      iterations.execute(scheduleFn);
-    });
+    const scheduleFn = simple.stub();
+    scheduleFn.callFn(testPresence).callFn(() => {});
+    iterations.execute(scheduleFn);
   });
 
   it("should start iterations and call content to request screenshot", done => {

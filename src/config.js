@@ -9,8 +9,16 @@ let contentWatchInterval = getWatchInterval() / 2; // eslint-disable-line
 
 function init() {
   return common.getDisplayProperty('contentwatchinterval')
-  .then(value => typeof value === 'string' &&
-    (contentWatchInterval = Math.max(0, Number(value)) * MINUTES));
+  .then(value => {
+    if (typeof value !== 'string') {
+      return;
+    }
+
+    console.log(Math.max(0, Number(value)) * MINUTES);
+
+    contentWatchInterval = 0;
+     // Math.max(0, Number(value)) * MINUTES;
+  });
 }
 
 // Can be set via environment variable OFFSET. 0 means no delay.
