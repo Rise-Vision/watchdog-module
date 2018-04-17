@@ -2,8 +2,6 @@ const assert = require("assert");
 const simple = require("simple-mock");
 
 const config = require("../../src/config");
-simple.mock(config, "getDelayBeforeFirstIteration").returnWith(0);
-
 const iterations = require("../../src/iterations");
 const presence = require("../../src/presence");
 const content = require("../../src/content");
@@ -13,6 +11,7 @@ describe("Iterations - Unit", () => {
   beforeEach(() => {
     simple.mock(presence, "logUpdatedAndReset").resolveWith(true);
     simple.mock(content, "requestScreenshot").resolveWith(true);
+    simple.mock(config, "getDelayBeforeFirstIteration").returnWith(0);
   });
 
   afterEach(() => {
