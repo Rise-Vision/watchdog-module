@@ -5,6 +5,25 @@ const DEFAULT_OFFSET = 1;
 const DEFAULT_WATCH_INTERVAL = 5;
 
 const moduleName = "watchdog";
+let contentWatchInterval = null;
+
+reset();
+
+function init() {
+  return common.getDisplayProperty('contentwatchinterval')
+  .then(value => {
+    if (typeof value !== 'string') {
+      return;
+    }
+
+    contentWatchInterval = Math.max(0, Number(value)) * MINUTES;
+
+    if (contentWatchInterval > 0) {
+      contentWatchInterval =
+        Math.max(contentWatchInterval, getWatchInterval() / 2); // eslint-disable-line no-magic-numbers
+    }
+  });
+}
 
 // Can be set via environment variable OFFSET. 0 means no delay.
 function getDelayBeforeFirstIteration() {
@@ -22,7 +41,11 @@ function getWatchInterval() {
 }
 
 function getContentWatchInterval() {
-  return getWatchInterval() / 2; // eslint-disable-line
+  return contentWatchInterval;
+}
+
+function reset() {
+  contentWatchInterval = getWatchInterval();
 }
 
 module.exports = {
@@ -30,6 +53,7 @@ module.exports = {
   bqDataset: "Module_Events",
   bqTable: "watchdog_events",
   failedEntryFile: "watchdog-failed.log",
+  init,
   logFolder: common.getModulePath(moduleName),
   moduleName,
   getModuleVersion() {
@@ -37,5 +61,6 @@ module.exports = {
   },
   getDelayBeforeFirstIteration,
   getWatchInterval,
-  getContentWatchInterval
+  getContentWatchInterval,
+  reset
 };
