@@ -18,13 +18,15 @@ describe("Logger - Unit", ()=>
   });
 
   afterEach(()=> {
-    simple.restore()
+    simple.restore();
+    logger.reset();
   });
 
   it("should send up module availability", () => {
     return logger.logModuleAvailability('display-control', true)
     .then(() => {
       assert(messaging.broadcastMessage.called);
+      assert.equal(common.getModuleVersion.callCount, 2);
 
       // this is the actual event object sent to the logging module
       const event = messaging.broadcastMessage.lastCall.args[0]
@@ -43,7 +45,7 @@ describe("Logger - Unit", ()=>
       // the BigQuery row entry, see design doc for individual element description
       const row = data.data
       assert.equal(row.event, "module-up")
-      assert.equal(row.event_details, "display-control")
+      assert.equal(row.event_details, "display-control1.1")
       assert.equal(row.display_id, "DIS123")
       assert.equal(row.version, "1.1")
       // ts will be inserted in logging module, so we won't be checking it here
@@ -54,6 +56,7 @@ describe("Logger - Unit", ()=>
     return logger.logModuleAvailability('display-control', false)
     .then(() => {
       assert(messaging.broadcastMessage.called);
+      assert.equal(common.getModuleVersion.callCount, 1);
 
       // this is the actual event object sent to the logging module
       const event = messaging.broadcastMessage.lastCall.args[0]
@@ -72,11 +75,24 @@ describe("Logger - Unit", ()=>
       // the BigQuery row entry, see design doc for individual element description
       const row = data.data
       assert.equal(row.event, "module-down")
-      assert.equal(row.event_details, "display-control")
+      assert.equal(row.event_details, "display-control1.1")
       assert.equal(row.display_id, "DIS123")
       assert.equal(row.version, "1.1")
       // ts will be inserted in logging module, so we won't be checking it here
     })
   });
 
+  it("caches module versions", () => {
+    assert.equal(common.getModuleVersion.callCount, 0);
+
+    return logger.logModuleAvailability('display-control', false)
+    .then(()=>{
+      assert.equal(common.getModuleVersion.callCount, 1);
+      return logger.logModuleAvailability('display-control', false);
+    })
+    .then(()=>{
+      assert(messaging.broadcastMessage.called);
+      assert.equal(common.getModuleVersion.callCount, 1);
+    });
+  });
 });

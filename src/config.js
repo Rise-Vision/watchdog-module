@@ -6,6 +6,7 @@ const DEFAULT_WATCH_INTERVAL = 5;
 
 const moduleName = "watchdog";
 let contentWatchInterval = null;
+let moduleVersion = null;
 
 reset();
 
@@ -57,7 +58,11 @@ module.exports = {
   logFolder: common.getModulePath(moduleName),
   moduleName,
   getModuleVersion() {
-    return common.getModuleVersion(moduleName)
+    if (!moduleVersion) {
+      moduleVersion = common.getModuleVersion(moduleName);
+    }
+
+    return moduleVersion;
   },
   getDelayBeforeFirstIteration,
   getWatchInterval,
