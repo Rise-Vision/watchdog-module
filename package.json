@@ -6,9 +6,12 @@
   "scripts": {
     "build": "eslint . && webpack",
     "postbuild": "rimraf build/watchdog && rimraf build/*.zip",
-    "test": "eslint test && eslint src && mocha -r test/mocha-env.js -t 20000 --recursive --exit test/unit/** test/integration/**",
-    "test-unit": "eslint test && eslint src && mocha -r test/mocha-env.js -t 20000 --recursive --exit test/unit/**",
-    "test-integration": "eslint test && eslint src && mocha -r test/mocha-env.js -t 20000 --recursive --exit test/integration/**"
+    "lint": "eslint test && eslint src",
+    "test": "npm run lint && npm run test-unit-no-lint && npm run test-integration-no-lint",
+    "test-unit-no-lint": "mocha -r test/mocha-env.js -t 20000 --recursive --exit test/unit/**",
+    "test-integration-no-lint": "mocha -r test/mocha-env.js -t 20000 --recursive --exit test/integration/**",
+    "test-unit": "npm run lint && npm run test-unit-no-lint",
+    "test-integration": "npm run lint && npm run test-integration-no-lint"
   },
   "repository": {
     "type": "git",
