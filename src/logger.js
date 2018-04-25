@@ -8,6 +8,8 @@ const {
 const externalLogger = require("common-display-module/external-logger")(bqProjectName, bqDataset, failedEntryFile);
 const logger = require("rise-common-electron/logger")(externalLogger, logFolder, moduleName);
 
+let moduleVersions = {};
+
 // Creates the detail data structure that the logging functions expect.
 // Assigns "event_details" and "display_id", that are expected in the events table
 function detailsFor(eventDetails, data = {}) {
@@ -37,9 +39,21 @@ function external(eventType, eventDetails = "", data = {}) {
 
 function logModuleAvailability(watchedModuleName, isAvailable) {
   const eventType = isAvailable ? "module-up" : "module-down";
+  const watchedModuleVersion = getWatchedModuleVersion(watchedModuleName);
+  const eventDetails = `${watchedModuleName}${watchedModuleVersion}`;
 
-  return external(eventType, watchedModuleName);
+  return external(eventType, eventDetails);
 }
+
+function getWatchedModuleVersion(name) {
+  if (!moduleVersions[name]) {
+    moduleVersions[name] = common.getModuleVersion(name);
+  }
+
+  return moduleVersions[name] || "";
+}
+
+function reset() {moduleVersions = {};}
 
 module.exports = {
   file: logger.file,
@@ -47,5 +61,6 @@ module.exports = {
   error,
   external,
   all,
-  logModuleAvailability
+  logModuleAvailability,
+  reset
 };
