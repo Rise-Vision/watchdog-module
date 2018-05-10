@@ -34,12 +34,13 @@ function handleWhiteScreen(whiteScreenDetected, schedule = setTimeout, interval 
     return;
   }
 
-  repeatedWhiteScreenTimer = schedule(requestScreenshot, interval);
   whiteScreenEvents += 1;
   if (whiteScreenEvents >= MAX_CONSECUTIVE_EVENTS) {
     whiteScreenEvents = 0;
     logger.external("white screen detected");
     clearTimeout(repeatedWhiteScreenTimer);
+  } else {
+    repeatedWhiteScreenTimer = schedule(requestScreenshot, interval);
   }
 }
 
