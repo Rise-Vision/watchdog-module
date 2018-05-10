@@ -26,11 +26,10 @@ describe("Content - Unit", () => {
   function assertWhiteScreen(fileName) {
     const filePath = path.join(os.tmpdir(), fileName);
     fs.copyFileSync(path.resolve("test", "fixture", fileName), filePath);
+    const handler = simple.spy();
 
-    return content.checkWhiteScreen(filePath).then(() => {
-      assert.ok(logger.external.called);
-      const message = logger.external.lastCall.arg;
-      assert.equal(message, "white screen detected");
+    return content.checkWhiteScreen(filePath, handler).then(() => {
+      assert.equal(handler.lastCall.arg, true);
       assert.equal(fs.existsSync(filePath), false);
     });
   }
@@ -46,9 +45,10 @@ describe("Content - Unit", () => {
   function assertNonWhiteScreen(fileName) {
     const filePath = path.join(os.tmpdir(), fileName);
     fs.copyFileSync(path.resolve("test", "fixture", fileName), filePath);
+    const handler = simple.spy();
 
-    return content.checkWhiteScreen(filePath).then(() => {
-      assert.equal(logger.external.called, false);
+    return content.checkWhiteScreen(filePath, handler).then(() => {
+      assert.equal(handler.lastCall.arg, false);
       assert.equal(fs.existsSync(filePath), false);
     });
   }
@@ -71,5 +71,37 @@ describe("Content - Unit", () => {
 
   it("should not detect white screen when testing regular screenshot", () => {
     return assertNonWhiteScreen("regular.png");
+  });
+
+  it("should not log event when white screen detected only once", () => {
+    const scheduler = () => {};
+    const interval = 0;
+
+    content.handleWhiteScreen(true, scheduler, interval);
+
+    assert.equal(logger.external.called, false);
+  });
+
+  it("should not log event when white screen event is not consecutive", () => {
+    const scheduler = () => {};
+    const interval = 0;
+
+    content.handleWhiteScreen(false, scheduler, interval);
+    content.handleWhiteScreen(true, scheduler, interval);
+    content.handleWhiteScreen(false, scheduler, interval);
+
+    assert.equal(logger.external.called, false);
+  });
+
+  it("should log event after 3 consecutive detections", () => {
+    const scheduler = () => {};
+    const interval = 0;
+
+    content.handleWhiteScreen(true, scheduler, interval);
+    content.handleWhiteScreen(true, scheduler, interval);
+    content.handleWhiteScreen(true, scheduler, interval);
+
+    assert.ok(logger.external.called);
+    assert.equal(logger.external.lastCall.arg, "white screen detected");
   });
 });

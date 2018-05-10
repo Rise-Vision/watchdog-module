@@ -45,6 +45,10 @@ function getContentWatchInterval() {
   return contentWatchInterval;
 }
 
+function getRepeatedWhiteScreenCheckInterval() {
+  return contentWatchInterval / 5; // eslint-disable-line no-magic-numbers
+}
+
 function reset() {
   contentWatchInterval = getWatchInterval();
 }
@@ -67,5 +71,6 @@ module.exports = {
   getDelayBeforeFirstIteration,
   getWatchInterval,
   getContentWatchInterval,
+  getRepeatedWhiteScreenCheckInterval,
   reset
 };
