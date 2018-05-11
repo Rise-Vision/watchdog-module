@@ -5,6 +5,10 @@ const messaging = require("common-display-module/messaging");
 const config = require("./config");
 const logger = require("./logger");
 
+const MAX_CONSECUTIVE_EVENTS = 3;
+let repeatedWhiteScreenTimer = null;
+let whiteScreenEvents = 0;
+
 function requestScreenshot() {
   return messaging.broadcastMessage({
     from: config.moduleName,
@@ -12,17 +16,32 @@ function requestScreenshot() {
   });
 }
 
-function checkWhiteScreen(filePath) {
+function checkWhiteScreen(filePath, handler = handleWhiteScreen) {
   return readImage(filePath)
     .then(image => {
       const white = createWhiteImage(image);
       const diff = pixelmatch(image.data, white, null, image.width, image.height);
-      if (diff <= 0) {
-        logger.external("white screen detected");
-      }
+      const whiteScreenDetected = diff <= 0;
+      handler(whiteScreenDetected);
     })
     .then(() => fs.unlinkSync(filePath))
     .catch(() => fs.unlinkSync(filePath));
+}
+
+function handleWhiteScreen(whiteScreenDetected, schedule = setTimeout, interval = config.getRepeatedWhiteScreenCheckInterval()) {
+  if (!whiteScreenDetected) {
+    clearTimeout(repeatedWhiteScreenTimer);
+    return;
+  }
+
+  whiteScreenEvents += 1;
+  if (whiteScreenEvents >= MAX_CONSECUTIVE_EVENTS) {
+    whiteScreenEvents = 0;
+    logger.external("white screen detected");
+    clearTimeout(repeatedWhiteScreenTimer);
+  } else {
+    repeatedWhiteScreenTimer = schedule(requestScreenshot, interval);
+  }
 }
 
 function readImage(filePath) {
@@ -43,5 +62,6 @@ function createWhiteImage(image) {
 
 module.exports = {
   requestScreenshot,
-  checkWhiteScreen
+  checkWhiteScreen,
+  handleWhiteScreen
 };
