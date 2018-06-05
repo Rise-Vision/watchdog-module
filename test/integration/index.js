@@ -92,11 +92,12 @@ describe("Watchdog - Integration", ()=>
           if (row.event !== 'started' && row.event !== 'watching') {
             switch (row.event_details)
             {
-              case "player-electron": case "local-messaging": case "local-storage":
-              case "logging":
+              case "player-electron1.1": case "local-messaging1.1":
+              case "local-storage1.1": case "logging1.1":
                 assert(row.event, "module-up");
                 break;
-              case "display-control": case "system-metrics": case "viewer":
+              case "display-control1.1": case "system-metrics1.1":
+              case "viewer1.1":
                 assert(row.event, "module-down");
                 break;
               default:
@@ -144,11 +145,11 @@ describe("Watchdog - Integration", ()=>
           if (row.event !== 'watching') {
             switch (row.event_details)
             {
-              case "logging":
+              case "logging1.1":
                 assert(row.event, "module-down");
                 break;
-              case "viewer":
-              case "display-control":
+              case "viewer1.1":
+              case "display-control1.1":
                 assert(row.event, "module-up");
                 break;
               default:
