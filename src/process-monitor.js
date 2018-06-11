@@ -37,7 +37,7 @@ function checkProcess(timeoutScheduler) {
     }
 
     if (notFound) {
-      logger.external("no player watchdog", "restarting");
+      logger.external("no player watchdog", `restarting | ${stack} ${stderr}`);
       timeoutScheduler(starter.restart, fiveSeconds);
       return;
     }
