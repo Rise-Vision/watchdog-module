@@ -32,7 +32,7 @@ function checkProcess(timeoutScheduler) {
 
     if (found) {return;}
 
-    if (otherCommandError) {
+    if (otherCommandError || stack && stack.startsWith('Error: Command failed')) { // eslint-disable-line no-mixed-operators
       return logger.external("process monitor error", `${stack} ${stderr}`);
     }
 
