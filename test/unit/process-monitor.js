@@ -93,6 +93,21 @@ describe("Process Monitor - Unit", ()=>{
     assert.equal(starter.restart.callCount, 0);
   });
 
+  it("should log when the command fails, even if code is 1", () => {
+    simple.mock(childProc, "exec").callFn((cmd, opts, cb)=>{
+      cb({
+        code: 1,
+        stack: "Error: Command failed: wmic process get commandline |findstr asar\\watchdog ERROR: Description = Invalid namespace at ChildProcess.exithandler (child_process.js:223:12)"
+      }, "", "");
+    });
+
+    monitor.init(0, scheduler);
+
+    assert.equal(logger.external.lastCall.args[0], "process monitor error");
+    assert.equal(logger.external.callCount, 1);
+    assert.equal(starter.restart.callCount, 0);
+  });
+
   it("should log unexpected state if stdout is empty after successful command", () => {
     simple.mock(childProc, "exec").callFn((cmd, opts, cb)=>{
       cb({code: 0}, "", "");
