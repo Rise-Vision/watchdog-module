@@ -16,6 +16,13 @@ function requestScreenshot() {
   });
 }
 
+function broadcastWhiteScreenEvent() {
+  return messaging.broadcastMessage({
+    from: config.moduleName,
+    topic: "white-screen-detected"
+  });
+}
+
 function checkWhiteScreen(filePath, handler = handleWhiteScreen) {
   return readImage(filePath)
     .then(image => {
@@ -38,6 +45,7 @@ function handleWhiteScreen(whiteScreenDetected, schedule = setTimeout, interval 
   if (whiteScreenEvents >= MAX_CONSECUTIVE_EVENTS) {
     whiteScreenEvents = 0;
     logger.external("white screen detected");
+    broadcastWhiteScreenEvent();
     clearTimeout(repeatedWhiteScreenTimer);
   } else {
     repeatedWhiteScreenTimer = schedule(requestScreenshot, interval);
