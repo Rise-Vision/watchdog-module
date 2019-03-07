@@ -104,4 +104,17 @@ describe("Content - Unit", () => {
     assert.ok(logger.external.called);
     assert.equal(logger.external.lastCall.arg, "white screen detected");
   });
+
+  it("should broadcast event after 3 consecutive detections", () => {
+    const scheduler = () => {};
+    const interval = 0;
+
+    content.handleWhiteScreen(true, scheduler, interval);
+    content.handleWhiteScreen(true, scheduler, interval);
+    content.handleWhiteScreen(true, scheduler, interval);
+
+    assert.ok(messaging.broadcastMessage.called);
+    const message = messaging.broadcastMessage.lastCall.arg;
+    assert.deepEqual(message, {from: "watchdog", topic: "white-screen-detected"});
+  });
 });
