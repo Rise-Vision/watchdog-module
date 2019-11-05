@@ -18,6 +18,8 @@ process.on("unhandledRejection", (reason)=>{
   process.exit(); // eslint-disable-line no-process-exit
 });
 
+process.on("SIGPIPE", () => logger.external("SIGPIPE received"));
+
 function run(schedule = setInterval) {
   return config.init()
   .then(() => {
