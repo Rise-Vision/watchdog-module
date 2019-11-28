@@ -25,8 +25,9 @@ function checkProcess(timeoutScheduler) {
   };
 
   childProc.exec(command, options, (err, stdout, stderr)=>{ // eslint-disable-line max-statements
-    const found = err === null && stdout.includes("player-electron");
-    const notFound = !stdout.includes("player-electron");
+    const playerNotFound = !stdout.includes("player-electron");
+    const localMessagingNotFound = !stdout.includes("local-messaging");
+    const found = err === null && !playerNotFound && !localMessagingNotFound;
     const otherCommandError = err && err.code !== 1;
     const stack = err && err.stack;
 
@@ -36,8 +37,9 @@ function checkProcess(timeoutScheduler) {
       return logger.external("process monitor error", `${stack} ${stderr}`);
     }
 
-    if (notFound) {
-      logger.external("no player watchdog", `restarting | ${stack} ${stderr}`);
+    if (playerNotFound || localMessagingNotFound) {
+      const module = playerNotFound ? "player" : "local-messaging";
+      logger.external(`no ${module} watchdog`, `restarting | ${stack} ${stderr}`);
       timeoutScheduler(starter.restart, fiveSeconds);
       return;
     }
